@@ -4,7 +4,7 @@
 > **Authority:** Architecture authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## 1. Architectural decision
@@ -35,6 +35,10 @@ For a developer coming from ASP.NET Web Forms or MVC:
 | Monitoring | Sentry | Error and performance monitoring with SvelteKit integration; scrub sensitive data aggressively. |
 | Tests | Vitest + Playwright | Fast deterministic domain tests plus browser-level workflow and accessibility checks. |
 | PDFs | Authenticated print routes + Playwright | HTML/CSS remains the report template; PDF is rendered from an immutable snapshot-specific route. |
+
+### Version currency
+
+Per **OD-03**, adopt the latest **stable** (non-prerelease) release of each stack tool at add or deliberate upgrade time. Node.js follows the [nodejs.org](https://nodejs.org) **production** recommendation (Active LTS) at scaffold and Node upgrades. Exact versions are pinned in `.nvmrc`, `package.json` `engines` / `packageManager`, and `pnpm-lock.yaml`. CI and local installs use those pins—never floating `latest` tags. Prerelease packages are not defaults.
 
 ### Cost-control principles
 

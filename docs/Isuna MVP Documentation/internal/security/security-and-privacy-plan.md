@@ -4,7 +4,7 @@
 > **Authority:** Security and privacy control authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## 1. Scope and posture
@@ -252,7 +252,7 @@ Do not destroy logs prematurely, blame users, or claim scope is known before evi
 
 ## 20. Dependency and supply-chain security
 
-- Pin lockfile; use supported Node/package manager versions.
+- Select the latest stable (non-prerelease) versions per OD-03; pin the lockfile and Node/pnpm (production LTS recommendation for Node). CI installs from those pins—not floating `latest` tags.
 - Automated dependency review/audit and GitHub security alerts.
 - Minimize dependencies; document why privileged or parsing libraries are needed.
 - Review maintainer health, update cadence, license, transitive size and security history.

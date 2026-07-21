@@ -4,7 +4,7 @@
 > **Authority:** AI-assisted development operating contract  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## 1. Non-negotiable relationship
@@ -44,7 +44,8 @@ Cursor must not:
 - generate or modify the entire application or feature in one pass;
 - silently create dozens of files;
 - replace unrelated working code “for consistency”;
-- add dependencies without justification and official-document verification;
+- add dependencies without justification and official-document verification, or propose prerelease packages as defaults without founder-accepted debt;
+- invent package or runtime version numbers without founder-recorded evidence (OD-03: propose latest stable non-prerelease; Node follows production LTS recommendation);
 - bypass or disable RLS;
 - use the service-role key for normal user requests;
 - expose privileged credentials to browser code;
@@ -249,7 +250,7 @@ Cursor labels snippets:
 - **Illustrative:** demonstrates a concept and may omit integration details; must not be pasted into production unchanged.
 - **Pseudocode:** communicates sequence only.
 
-When an official API is version-sensitive, Cursor links/names the current official documentation and asks the founder to confirm installed versions.
+When an official API is version-sensitive, Cursor links/names the current official documentation and asks the founder to confirm installed versions. Per OD-03, Cursor proposes the latest **stable** (non-prerelease) release available at implementation time, confirms it against official docs, and never claims a version succeeded or is installed without founder-recorded evidence.
 
 ## 11. Technical-debt record
 
