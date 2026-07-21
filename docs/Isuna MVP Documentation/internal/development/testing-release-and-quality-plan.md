@@ -4,7 +4,7 @@
 > **Authority:** Quality and release authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## 1. Quality objective
@@ -200,7 +200,7 @@ A sprint demo is not a substitute for focused QA. Use a checklist with:
 ### Pull request
 
 1. checkout with minimal permissions;
-2. install pinned Node/pnpm dependencies from lockfile;
+2. install pinned Node/pnpm and dependencies from the lockfile (versions recorded after latest-stable selection per OD-03—not floating `latest` tags in workflows);
 3. format/lint/type/Svelte check;
 4. unit tests with coverage report as signal, not quota gaming;
 5. start isolated local Supabase/test database;

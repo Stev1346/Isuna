@@ -22,6 +22,8 @@ The founder is the sole developer. Cursor may be used as a senior mentor, review
 - Vercel, GitHub Actions, Stripe, Resend and Sentry
 - Vitest and Playwright
 
+Tooling targets the latest **stable** (non-prerelease) releases; Node.js follows the production LTS recommendation from nodejs.org. Exact version pins land during the Foundation Sprint in `.nvmrc`, `package.json`, and the lockfile.
+
 ## Documentation
 
 The full founding package is under:

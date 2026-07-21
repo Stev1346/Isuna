@@ -4,12 +4,16 @@
 > **Authority:** Decision authority  
 > **Audience:** Founder; consult Cursor and advisers as needed  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## Decision policy
 
 The project must keep moving without pretending unresolved choices are final. Each item below has a recommended default that may be implemented provisionally. A decision becomes final only when the founder changes its status to **Approved**, records the date and rationale, and updates dependent documents in the same pull request.
+
+## Decision changed
+
+- **2026-07-20 — OD-03:** Founder approved stack version currency (option 3): prefer latest stable non-prerelease for all stack tools; Node.js follows the nodejs.org production recommendation (Active LTS) at scaffold and deliberate upgrades; exact versions remain lockfile-pinned. Dependent architecture, standards, security, quality, Cursor guide, roadmap, and repository README sections updated in the same change set.
 
 ## Current decisions
 
@@ -29,14 +33,18 @@ The project must keep moving without pretending unresolved choices are final. Ea
 - **Decide by:** Sprint 1.
 - **Blocks the MVP:** No.
 - **Status:** Recommended default accepted provisionally until the founder records a change.
-### OD-03: Package manager and Node version
+### OD-03: Package manager, Node channel, and stack version currency
 
-- **Why it matters:** Determines lockfile, CI and local consistency.
-- **Recommended default:** pnpm with the current active LTS Node version pinned in `.nvmrc` and `package.json` engines at repository creation.
-- **Alternatives:** npm; Bun; Yarn.
+- **Why it matters:** Determines lockfile, CI, local consistency, and how dependencies are selected and upgraded across the stack.
+- **Recommended default (Approved):** Prefer the latest **stable** (non-prerelease) version of every stack tool, with these rules:
+  - **Package manager:** pnpm, pinned via Corepack / `packageManager` and the lockfile when the repository is created.
+  - **Node.js:** At repository scaffold and at deliberate Node upgrades, use whatever [nodejs.org](https://nodejs.org) recommends for **production** (Active LTS channel). Pin the exact version in `.nvmrc` and `package.json` `engines` once scaffolding exists.
+  - **Other stack packages** (SvelteKit, Svelte 5, TypeScript, Tailwind, Bits UI, Supabase clients/CLI, Vitest, Playwright, ESLint tooling, Stripe/Resend/Sentry SDKs when added): select the newest stable release available at add or deliberate upgrade time—not alpha/beta/canary/RC unless the founder accepts temporary debt with a repayment trigger.
+  - **Reproducibility:** “Latest stable” is a selection policy, not floating CI. Local installs and CI use the lockfile (`pnpm-lock.yaml`) and pinned Node/pnpm. Upgrades are intentional PRs with tests, not silent drift.
+- **Alternatives:** npm; Bun; Yarn; pin Node Current instead of production LTS; allow prerelease defaults.
 - **Decide by:** Sprint 1.
 - **Blocks the MVP:** Yes for setup.
-- **Status:** Recommended default accepted provisionally until the founder records a change.
+- **Status:** Approved — 2026-07-20. Owner: Founder. Rationale: option 3 — latest stable for the stack; Node follows the production recommendation (Active LTS) at scaffold/upgrade time; exact pins recorded after Foundation scaffolding.
 ### OD-04: Canonical money representation
 
 - **Why it matters:** Affects every schema and calculation.

@@ -4,7 +4,7 @@
 > **Authority:** Engineering standards authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## 1. Repository model
@@ -281,6 +281,15 @@ Add a dependency only when:
 - bundle/server impact is understood;
 - abstraction/exit cost is acceptable;
 - tests cover the integration.
+
+Version currency (OD-03):
+
+- Prefer the newest **stable** (non-prerelease) release when adding or deliberately upgrading a package.
+- Node.js follows the nodejs.org production recommendation (Active LTS); pin exact versions in `.nvmrc` and `package.json` `engines`.
+- Pin pnpm via Corepack / `packageManager` and commit `pnpm-lock.yaml`; CI and local installs use the lockfile, not floating tags.
+- Cursor must verify current official versions before suggesting packages and must not invent version numbers.
+- Major or security-sensitive upgrades ship as reviewed PRs with tests—not silent drift or auto-merge without evidence.
+- Alpha/beta/canary/RC defaults require founder-accepted technical debt with a repayment trigger.
 
 Cursor must explain why a dependency is needed and alternatives considered. Do not add a general utility library for one trivial function.
 

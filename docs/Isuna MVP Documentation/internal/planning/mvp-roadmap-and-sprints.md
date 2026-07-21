@@ -4,7 +4,7 @@
 > **Authority:** Delivery sequence authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-20
 
 
 ## Planning assumptions
@@ -38,12 +38,12 @@ A sprint ends on evidence and exit criteria, not the calendar. Carry over the sm
 - **User outcome:** The founder can clone the repository, run the app and database locally, execute baseline checks, and explain the server/browser structure.
 - **Learning objectives:** SvelteKit file routing; Svelte 5 component basics; TypeScript strictness; pnpm/Node; Supabase CLI/local stack; environment separation; GitHub Actions.
 - **Scope:** Repository/branch protection; `npx sv create`; Tailwind; Bits UI evaluation spike; local Supabase; first migration placeholder only for extensions; Vitest/Playwright; app shell; design tokens; lint/type/build CI; docs copied under `docs/`.
-- **Prerequisites:** Approved package-manager/Node/component defaults; GitHub, Vercel and Supabase development accounts.
+- **Prerequisites:** OD-03 stack-currency policy Approved (latest stable selection; Node = production LTS recommendation); OD-02 component default confirmed or still provisional; GitHub, Vercel and Supabase development accounts.
 - **Stories:** Engineering enablers; no end-user financial story is considered delivered.
 - **Technical tasks:** Pin runtime; configure aliases and strict TS; create route groups; add `$lib/server` boundary; local env validation; CI workflow; preview deployment connected to non-production environment; README setup instructions.
 - **Security tasks:** Secret scanning; `.gitignore`; no production credentials; CI least permissions; environment matrix; secure headers backlog identified.
 - **Tests:** Sample pure unit test; Playwright smoke page; clean migration apply; production build; forbidden private-env browser import test.
-- **Documentation:** Repository standards, setup README, open decisions updated with actual versions.
+- **Documentation:** Repository standards, setup README, open decisions updated with exact Node/pnpm/package versions recorded after scaffold (OD-03 policy already Approved).
 - **Demo:** Fresh clone to running local app; unit/E2E/build/CI pass; show no secrets and route/server structure.
 - **Acceptance criteria:** Another developer could follow README; founder explains each tool; `main` protected; CI runs; local DB resets reproducibly.
 - **Out of scope:** Auth, real tables, provider integrations, visual polish beyond foundations.
