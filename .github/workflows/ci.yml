@@ -41,8 +41,12 @@ jobs:
       - name: Type / Svelte check
         run: pnpm run check
 
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+
       - name: Unit tests
         run: pnpm exec vitest run
 
       - name: Production build
         run: pnpm run build
+        
