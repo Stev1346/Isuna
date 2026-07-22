@@ -4,7 +4,7 @@
 > **Authority:** Decision authority  
 > **Audience:** Founder; consult Cursor and advisers as needed  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-20
+> **Last reviewed:** 2026-07-21
 
 
 ## Decision policy
@@ -14,6 +14,7 @@ The project must keep moving without pretending unresolved choices are final. Ea
 ## Decision changed
 
 - **2026-07-20 — OD-03:** Founder approved stack version currency (option 3): prefer latest stable non-prerelease for all stack tools; Node.js follows the nodejs.org production recommendation (Active LTS) at scaffold and deliberate upgrades; exact versions remain lockfile-pinned. Dependent architecture, standards, security, quality, Cursor guide, roadmap, and repository README sections updated in the same change set.
+- **2026-07-21 — OD-03 versions recorded:** Node `24.18.0`, pnpm `10.15.1`, Supabase CLI upgraded `2.90.0` → `2.109.1` (Homebrew). App Node remains nvm-pinned LTS; Homebrew Node is unused for the project.
 
 ## Current decisions
 
@@ -28,11 +29,11 @@ The project must keep moving without pretending unresolved choices are final. Ea
 ### OD-02: Accessible component approach
 
 - **Why it matters:** Controls accessibility burden and design-system ownership.
-- **Recommended default:** Use Bits UI headless Svelte 5 primitives plus Isuna-owned Tailwind components; evaluate shadcn-svelte only as source inspiration.
+- **Recommended default (Approved):** Use Bits UI headless Svelte 5 primitives plus Isuna-owned Tailwind components; evaluate shadcn-svelte only as source inspiration.
 - **Alternatives:** Native HTML only; shadcn-svelte components; another audited library.
 - **Decide by:** Sprint 1.
 - **Blocks the MVP:** No.
-- **Status:** Recommended default accepted provisionally until the founder records a change.
+- **Status:** Approved — 2026-07-20. Owner: Founder. Rationale: Recommended default accepted.
 ### OD-03: Package manager, Node channel, and stack version currency
 
 - **Why it matters:** Determines lockfile, CI, local consistency, and how dependencies are selected and upgraded across the stack.
