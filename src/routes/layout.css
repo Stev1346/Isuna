@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+:root {
+	/* Brand — Isuna Teal */
+	--color-brand-50: #effaf8;
+	--color-brand-100: #d8f3ee;
+	--color-brand-500: #168c7e;
+	--color-brand-600: #0b7066;
+	--color-brand-700: #085b54;
+
+	/* Neutral — Warm Slate */
+	--color-neutral-25: #fcfcfa;
+	--color-neutral-50: #f7f7f4;
+	--color-neutral-200: #dde0da;
+	--color-neutral-700: #38413b;
+	--color-neutral-800: #252c27;
+
+	/* Semantic */
+	--color-positive: #2f7d52;
+	--color-warning: #a86408;
+	--color-negative: #b33a3a;
+	--color-info: #2f67a8;
+	--color-closed: #625a78;
+
+	/* Surfaces */
+	--color-app-bg: var(--color-neutral-25);
+	--color-surface: #ffffff;
+	--color-border: var(--color-neutral-200);
+	--color-text: var(--color-neutral-700);
+	--color-heading: var(--color-neutral-800);
+	--color-action: var(--color-brand-600);
+}
