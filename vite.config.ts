@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-import {loadEnv} from 'vite';
+import { loadEnv } from 'vite';
 import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-auto';

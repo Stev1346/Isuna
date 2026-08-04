@@ -3,7 +3,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { forgotPasswordSchema } from '$lib/schemas/auth.js';
 import { env } from '$env/dynamic/private';
 
-const GENERIC_SENT = 'If an account exists, the email link proves you can access that inbox and lets you set a new password.';
+const GENERIC_SENT =
+	'If an account exists, the email link proves you can access that inbox and lets you set a new password.';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const auth = await locals.getAuthContext();

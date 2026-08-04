@@ -2,7 +2,7 @@ import { updatePasswordSchema } from '$lib/schemas/auth.js';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({url}) => {
+export const load: PageServerLoad = async ({ url }) => {
 	return {
 		fromRecovery: url.searchParams.get('from') === 'recovery'
 	};
