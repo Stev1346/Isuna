@@ -4,7 +4,7 @@
 > **Authority:** Decision authority  
 > **Audience:** Founder; consult Cursor and advisers as needed  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-21
+> **Last reviewed:** 2026-08-04
 
 
 ## Decision policy
@@ -15,6 +15,8 @@ The project must keep moving without pretending unresolved choices are final. Ea
 
 - **2026-07-20 — OD-03:** Founder approved stack version currency (option 3): prefer latest stable non-prerelease for all stack tools; Node.js follows the nodejs.org production recommendation (Active LTS) at scaffold and deliberate upgrades; exact versions remain lockfile-pinned. Dependent architecture, standards, security, quality, Cursor guide, roadmap, and repository README sections updated in the same change set.
 - **2026-07-21 — OD-03 versions recorded:** Node `24.18.0`, pnpm `10.15.1`, Supabase CLI upgraded `2.90.0` → `2.109.1` (Homebrew). App Node remains nvm-pinned LTS; Homebrew Node is unused for the project.
+- **2026-07-21 — Sprint 2 Checkpoint 1 (auth architecture):** Founder approved identity/session/profile foundation decisions: `getAuthContext()` uses `getClaims()` (with `getUser()` only when Auth-server freshness is required); profiles PK `user_id`; profile create via `auth.users` insert trigger plus idempotent app ensure; own-user profile RLS only (no anon/public profile reads); profile defaults `locale = en-CA`, `timezone = America/Edmonton`; protected empty shell at `/app`; email must be verified before `(app)` access. Dependent auth architecture, playbook, roadmap, database model, and security plan updated. **OD-10** remains provisional until Sprint 3 (households). **OD-19** recorded Approved.
+- **2026-08-04 — OD-19 clarification (Sprint 2 exit):** Founder confirmed that “verified email” means proof of inbox access. Completing Supabase password recovery (reset link) confirms the email the same way signup confirmation does; Google OAuth with a verified provider email also qualifies. UX must state this on the recovery password page (`?from=recovery`). No change to the Approved gate: unverified identities still cannot use `(app)` / `/app`.
 
 ## Current decisions
 
@@ -99,9 +101,9 @@ The project must keep moving without pretending unresolved choices are final. Ea
 - **Why it matters:** Determines authorization matrix.
 - **Recommended default:** Owner and Editor for MVP; owner-only membership, billing, export, deletion and close correction.
 - **Alternatives:** Add Viewer; granular permissions.
-- **Decide by:** Sprint 2.
+- **Decide by:** Sprint 3 (deferred; Sprint 2 has no households).
 - **Blocks the MVP:** Yes.
-- **Status:** Recommended default accepted provisionally until the founder records a change.
+- **Status:** Recommended default accepted provisionally until the founder records a change. Remains provisional after Sprint 2 Checkpoint 1 (2026-07-21).
 ### OD-11: Account balance source of truth
 
 - **Why it matters:** Impacts reconciliation and net worth.
@@ -166,6 +168,14 @@ The project must keep moving without pretending unresolved choices are final. Ea
 - **Decide by:** Sprint 4.
 - **Blocks the MVP:** No.
 - **Status:** Recommended default accepted provisionally until the founder records a change.
+### OD-19: Email verification before protected app access
+
+- **Why it matters:** Separates “account exists” from “trusted identity may enter the application”; reduces abuse and aligns with Canadian trust expectations before any financial data.
+- **Recommended default (Approved):** Require a verified email (Supabase Auth email confirmation, or equivalent verified identity from Google OAuth) before access to `(app)` routes, including the empty `/app` shell. Unverified sessions may use auth/recovery flows only.
+- **Alternatives:** Allow unverified access to empty shell with banner; verify only before household creation.
+- **Decide by:** Sprint 2.
+- **Blocks the MVP:** Yes for auth foundation.
+- **Status:** Approved — 2026-07-21; clarified 2026-08-04. Owner: Founder. Rationale: Sprint 2 Checkpoint 1; security plan preferred verification before sensitive use; extend the gate to all protected app routes. Clarification: recovery-link completion is accepted as email verification (inbox proof), with UX clarity on the change-password page; not a bypass of OD-19.
 
 
 ## Decision record template

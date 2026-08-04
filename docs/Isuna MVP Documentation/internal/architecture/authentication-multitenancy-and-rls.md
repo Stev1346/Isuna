@@ -4,7 +4,7 @@
 > **Authority:** Authorization authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-21
 
 
 ## 1. Security model
@@ -22,20 +22,23 @@ MVP identity providers:
 - Google OAuth;
 - future MFA/passkeys only after explicit planning, while account-security UX should not prevent adding them.
 
-Profiles are application records keyed by `auth.users.id`. Do not copy passwords or provider tokens into public tables. Treat email as mutable identity metadata, not a permanent business primary key.
+Profiles are application records keyed by `auth.users.id` as `profiles.user_id`. Do not copy passwords or provider tokens into public tables. Treat email as mutable identity metadata, not a permanent business primary key.
+
+**Verified access (OD-19):** Email must be verified (or the identity must be equivalently verified via Google OAuth) before any `(app)` route, including the empty `/app` shell. Unverified users stay on auth/recovery flows. Password recovery that successfully verifies a recovery token also sets email confirmation in Supabase Auth (inbox proof). Surface this in UX when landing from `?from=recovery`.
 
 ## 3. Session handling in SvelteKit
 
-At implementation time follow current Supabase SSR documentation rather than an old Auth Helpers tutorial.
+At implementation time follow current Supabase SSR documentation (`@supabase/ssr`) rather than deprecated Auth Helpers tutorials.
 
 Recommended flow:
 
-1. `hooks.server.ts` creates a request-scoped server Supabase client using the request/response cookie adapter.
-2. The hook validates or refreshes the session/claims according to the current SDK guidance.
-3. `event.locals` exposes a narrow function such as `getAuthContext()` and the server client.
-4. Protected route layouts call the verified auth function and redirect when absent.
-5. Server actions/endpoints independently authorize; a protected layout is not sufficient because endpoints can be called directly.
-6. Responses containing financial data use private/no-store caching policy where appropriate.
+1. `hooks.server.ts` creates a request-scoped server Supabase client using the request/response cookie adapter (`getAll` / `setAll`).
+2. The hook refreshes/validates auth material according to current SDK guidance.
+3. `event.locals` exposes a narrow function `getAuthContext()` and the server client.
+4. `getAuthContext()` verifies identity with **`auth.getClaims()`** (JWT signature / JWKS). Use **`auth.getUser()`** only when a fresh Auth-server user record is required (for example confirming email verification status). Do **not** authorize from **`auth.getSession()`**’s embedded user object—session cookies can be spoofed; `getSession` is for access/refresh token needs only.
+5. Protected `(app)` layouts call `getAuthContext()`, enforce OD-19 verification, and redirect when identity is absent or unverified.
+6. Server actions/endpoints independently authorize; a protected layout is not sufficient because endpoints can be called directly.
+7. Responses containing financial (or future financial) data use private/no-store caching policy where appropriate.
 
 Representative contract:
 
@@ -43,6 +46,7 @@ Representative contract:
 export type AuthContext = {
   userId: string;
   email?: string;
+  emailVerified: boolean;
 };
 
 declare global {
@@ -55,7 +59,7 @@ declare global {
 }
 ```
 
-The exact claims API may change. Do not claim a session is valid merely because a token payload can be decoded.
+Do not claim a session is valid merely because a token payload can be decoded without signature verification. Re-check current Supabase SSR docs if claim APIs change; keep this contract stable for application code.
 
 ## 4. Browser versus server client
 
@@ -65,7 +69,7 @@ The exact claims API may change. Do not claim a session is valid merely because 
 | Request-scoped server client | Public key + user cookies/claims | Queries executed as the authenticated user so RLS applies; normal application path. |
 | Service/administrative client | Secret service-role key | Narrow server-only jobs that require bypass, with explicit authorization and audit. Never use for ordinary user requests. |
 
-A service-role client bypasses RLS and therefore must never be used merely to “fix” a policy problem.
+A service-role client bypasses RLS and therefore must never be used merely to “fix” a policy problem. Sprint 2 auth and profile paths must not use the service role.
 
 ## 5. Protected routes
 
@@ -74,14 +78,33 @@ Use route groups such as:
 ```text
 src/routes/
   (public)/
-  (auth)/
+  (auth)/                  # register, sign-in, forgot-password, callback/confirm
   (app)/
-    +layout.server.ts       # require authenticated identity
-    households/[householdId]/...
+    +layout.server.ts      # require verified AuthContext (OD-19)
+    +page                   # empty protected shell at URL /app
+    account/...             # later profile/password
+    households/[householdId]/...  # Sprint 3+
   api/webhooks/stripe/      # provider-authenticated, not user session
 ```
 
+**Sprint 2 empty shell URL:** `/app` (route group `(app)` does not appear in the path; use a concrete `/app` segment or equivalent so the protected home is `/app`).
+
+Redirect rules:
+
+- Unauthenticated or unverified → `(app)/*` → allowlisted local sign-in/verify path (for example `/sign-in?redirectTo=…` with local-path allowlist only).
+- OAuth and email confirmation callbacks exchange tokens into cookies, then return only to safe local paths.
+- Never put tokens in logs, telemetry, or open redirects to absolute external URLs.
+
 The `[householdId]` route value is untrusted input. Resolve membership before returning data. Prefer resource lookup by both `id` and authorized household, or rely on RLS plus explicit not-found handling that does not reveal cross-tenant existence.
+
+## 5.1 Profiles (Sprint 2)
+
+- Table `public.profiles` with PK/FK `user_id` → `auth.users(id)` (not a differently named surrogate).
+- Columns: `display_name`, `locale`, `timezone`, `created_at`, `updated_at`.
+- Defaults for new rows: `locale = 'en-CA'`, `timezone = 'America/Edmonton'` (Canadian-first; household timezone remains separate in Sprint 3+).
+- **Create strategy:** `AFTER INSERT ON auth.users` trigger (`security definer`, fixed `search_path`, least grants) inserts one profile; application code may idempotently ensure a row (`ON CONFLICT DO NOTHING`) as a safety net. Profile created exactly once per auth user.
+- **RLS:** own-user only — `SELECT` / `INSERT` / `UPDATE` where `auth.uid() = user_id`. No `anon` access. No “public profiles viewable by everyone” policy. No normal authenticated `DELETE` (deletion follows Sprint 12 workflow).
+- Do not authorize from `user_metadata` / `raw_user_meta_data` in RLS (user-editable).
 
 ## 6. Membership model
 
