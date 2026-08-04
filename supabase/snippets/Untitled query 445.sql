@@ -1,0 +1,1 @@
+select user_id, display_name, locale, timezone from public.profiles;

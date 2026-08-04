@@ -4,7 +4,7 @@
 > **Authority:** Persistent data model authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-21
 
 
 ## 1. Modelling rules
@@ -63,14 +63,15 @@ The diagram omits some links for readability. The migration design must define e
 ### `profiles`
 
 - **Purpose:** Application profile linked one-to-one to `auth.users`.
-- **Important columns/types:** `user_id uuid PK/FK`; `display_name text`; `locale text`; `timezone text`; `created_at timestamptz`; `updated_at timestamptz`.
-- **Relationships:** One auth user; many memberships.
+- **Important columns/types:** `user_id uuid PK/FK` → `auth.users(id)`; `display_name text`; `locale text` default `en-CA`; `timezone text` default `America/Edmonton`; `created_at timestamptz`; `updated_at timestamptz`.
+- **Relationships:** One auth user; many memberships (Sprint 3+).
 - **Constraints:** Display length; valid locale/timezone format; timestamps.
 - **Indexes:** PK; optional lower display/search index only if needed.
-- **Unique constraints:** One profile per auth user.
+- **Unique constraints:** One profile per auth user (`user_id` PK).
 - **Household ownership:** User-owned, not household-owned.
+- **Create strategy (Sprint 2 Checkpoint 1):** Trigger on `auth.users` insert creates the row; application may idempotently ensure. Exactly one profile per auth user.
 - **Archive/deletion:** Delete with auth user after retention workflow; audit references use opaque actor ID.
-- **RLS considerations:** User may read/update own profile; household peers receive only deliberately exposed member view.
+- **RLS considerations:** User may `select`/`insert`/`update` own profile only (`auth.uid() = user_id`); no `anon` policies; no public-read policy; household peers receive only a deliberately exposed member view later—not full profile table SELECT for others.
 ### `households`
 
 - **Purpose:** Tenant/workspace and default financial settings.
@@ -503,7 +504,7 @@ A production implementation must consider migration/admin operations and use a c
 ## 7. Recommended migration sequence
 
 1. Extensions, shared functions, enum/check types and timestamp helpers.
-2. Profiles and profile trigger from Auth with a minimal failure-safe design.
+2. Profiles and profile trigger from Auth with a minimal failure-safe design (`user_id` PK, own-user RLS, defaults `en-CA` / `America/Edmonton`, idempotent ensure).
 3. Households, members and membership helper functions.
 4. Invitations and acceptance function.
 5. Accounts, categories and opening/account balance snapshots.

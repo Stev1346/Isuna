@@ -4,7 +4,7 @@
 > **Authority:** Implementation sequence authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-16
+> **Last reviewed:** 2026-07-21
 
 
 ## How to use this playbook
@@ -49,36 +49,37 @@ snapshot-only view model -> private versioned PDF
 ## Authentication
 
 - **Feature purpose:** Establish a verified identity and protected session boundary.
-- **Relevant documents:** master-prd; authentication-multitenancy-and-rls; security plan; auth stories.
+- **Relevant documents:** master-prd; authentication-multitenancy-and-rls; security plan; auth stories; open-decisions (OD-19).
 - **Dependencies:** Foundation, Supabase project and redirect/email config.
-- **Concepts to understand:** SSR cookies and claims, hooks/locals, form actions, OAuth callback, safe redirects.
+- **Concepts to understand:** SSR cookies and claims (`getClaims` / `getUser` / `getSession`), hooks/locals, form actions, OAuth callback, safe redirects, email verification gate.
+- **Checkpoint 1 approved (2026-07-21):** See open-decisions Decision changed and OD-19. Implement against that contract; do not reopen without a decision update.
 
 ### Recommended implementation sequence
 
 1. Create the Supabase browser client with public configuration.
 2. Create the request-scoped server client using the current SSR cookie adapter.
-3. Define `App.Locals` and a verified `getAuthContext` contract.
+3. Define `App.Locals` and a verified `getAuthContext` contract (`getClaims()`; `emailVerified`; optional `getUser()` for freshness).
 4. Configure `hooks.server.ts` to create context and sanitized error correlation.
-5. Create profile migration, own-profile RLS and generated types.
+5. Create profile migration, own-profile RLS, Auth insert trigger + idempotent ensure, and generated types.
 6. Create registration Zod schema and page/action.
 7. Add verification callback and safe local return handling.
 8. Create sign-in and sign-out.
 9. Create recovery request and password-update flow.
 10. Add Google OAuth and collision/callback tests.
-11. Protect `(app)` routes and sensitive cache behaviour.
+11. Protect `(app)` routes at `/app` (verified email required) and sensitive cache behaviour.
 12. Add unit, RLS and Playwright auth tests.
 
 ### Expected shape
 
-- **Routes:** `/(auth)/register`, `/sign-in`, `/forgot-password`, `/auth/callback`, `/account/password`, protected `(app)` layout.
+- **Routes:** `/(auth)/register`, `/sign-in`, `/forgot-password`, `/auth/callback` (or confirm), `/account/password`, protected `(app)` with empty shell **`/app`**.
 - **Server modules:** `server/auth/supabase-server.ts`, `server/auth/context.ts`, profile queries/services.
 - **Schemas:** Registration, sign-in, reset and redirect schemas.
-- **Database changes:** Profiles table/RLS only.
+- **Database changes:** Profiles table/RLS/trigger only (`user_id` PK; defaults `en-CA` / `America/Edmonton`).
 - **UI components:** AuthField, PasswordField, AuthForm, verification/error states.
-- **Authorization:** Verified session for protected data; user owns profile only.
+- **Authorization:** Verified session + verified email (OD-19) for `(app)`; user owns profile only; no service role on this path.
 - **Validation:** Bounded fields; generic enumeration response; allowlisted return paths.
-- **Required tests:** Unit schemas; profile RLS; expiry/sign-out/direct route E2E.
-- **Manual verification:** Register, verify, refresh, sign out, back button, reset expired token.
+- **Required tests:** Unit schemas; profile RLS; expiry/sign-out/direct route/unverified block E2E.
+- **Manual verification:** Register, verify, refresh, sign out, back button, reset expired token, unverified cannot open `/app`.
 - **Security review:** No token logs; CSRF/origin/callback review; no service role.
 - **Completion criteria:** All auth stories pass and later code has one stable auth context.
 
@@ -90,26 +91,26 @@ I am implementing Authentication as Isuna’s sole developer. Read the relevant 
 ## Profiles
 
 - **Feature purpose:** Store minimal application identity/preferences without duplicating Auth secrets.
-- **Relevant documents:** database model; auth guide; privacy plan.
+- **Relevant documents:** database model; auth guide; privacy plan; open-decisions Sprint 2 Checkpoint 1.
 - **Dependencies:** Authentication.
-- **Concepts to understand:** Auth metadata versus application profile; own-data RLS.
+- **Concepts to understand:** Auth metadata versus application profile; own-data RLS; trigger + idempotent ensure.
 
 ### Recommended implementation sequence
 
-1. Confirm minimal fields/purposes.
-2. Create idempotent profile creation strategy.
+1. Confirm minimal fields/purposes (`user_id`, display name, `en-CA`, `America/Edmonton`).
+2. Create trigger-based profile creation with idempotent ensure.
 3. Add own-profile query/update service.
 4. Create account/profile page.
 5. Test another user cannot read/update private profile fields.
 
 ### Expected shape
 
-- **Routes:** `/(app)/account/profile`.
+- **Routes:** `/(app)/account/profile` (under verified `(app)` gate).
 - **Server modules:** `server/db/queries/profiles.ts`, `server/services/profile-service.ts`.
 - **Schemas:** Display name, locale, timezone.
-- **Database changes:** Profiles table/trigger or explicit create.
+- **Database changes:** Profiles table + Auth insert trigger; own-user RLS only.
 - **UI components:** Profile form and status.
-- **Authorization:** User can manage own profile; household member display uses narrow view.
+- **Authorization:** User can manage own profile; household member display uses narrow view later.
 - **Validation:** Lengths, locale/timezone allowlists.
 - **Required tests:** RLS + form action + duplicate profile.
 - **Manual verification:** Create/update with two users.

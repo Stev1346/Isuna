@@ -4,7 +4,7 @@
 > **Authority:** Security and privacy control authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-20
+> **Last reviewed:** 2026-07-21
 
 
 ## 1. Scope and posture
@@ -104,7 +104,7 @@ No field is added because it “might be useful for AI later.”
 ## 6. Authentication security
 
 - Use Supabase Auth; never handle password hashes directly.
-- Require email verification before sensitive household use according to approved UX.
+- Require email verification before protected `(app)` access, including the empty `/app` shell (OD-19 Approved 2026-07-21). Google OAuth counts as verified identity when the provider email is verified per Supabase Auth rules.
 - Configure strong password policy and rate/abuse controls supported by provider.
 - Use generic reset/invitation responses to limit account enumeration.
 - OAuth callback validates state and an allowlisted return destination.
@@ -114,7 +114,8 @@ No field is added because it “might be useful for AI later.”
 
 ## 7. Session security
 
-- Follow current Supabase SSR cookie guidance.
+- Follow current Supabase SSR cookie guidance (`@supabase/ssr`).
+- Verify identity for authorization with `getClaims()` (via `getAuthContext()`); use `getUser()` when Auth-server freshness is required; do not trust `getSession()`’s embedded user for authorization.
 - Cookies use secure attributes appropriate to environment; no tokens in URLs or local logs.
 - Rotate/refresh through supported SDK flow; validate claims server-side.
 - Sign-out clears relevant cookies and sensitive page responses are not shared-cacheable.

@@ -4,7 +4,7 @@
 > **Authority:** Delivery sequence authority  
 > **Audience:** Founder and Cursor  
 > **Status:** Founding MVP baseline  
-> **Last reviewed:** 2026-07-20
+> **Last reviewed:** 2026-07-21
 
 
 ## Planning assumptions
@@ -61,23 +61,24 @@ A sprint ends on evidence and exit criteria, not the calendar. Carry over the sm
 **Milestone:** Milestone 1: Authentication and households
 
 - **Objective:** Implement verified identity, SSR-compatible sessions, profile creation and protected app routes.
-- **User outcome:** A user can register, verify, sign in, recover access, sign out and reach a protected empty application area.
+- **User outcome:** A user can register, verify, sign in, recover access, sign out and reach a protected empty application area at `/app`.
 - **Learning objectives:** Supabase Auth SSR cookies/claims; SvelteKit hooks and locals; form actions; OAuth callback; expected error handling.
-- **Scope:** Browser/server Supabase clients; hooks; app.d.ts; email/password; verification callback; reset/update password; Google OAuth; profile table/RLS; auth layouts/pages; generic errors.
-- **Prerequisites:** Sprint 1; Supabase redirect URLs; test email path; current official SSR docs reviewed.
+- **Scope:** Browser/server Supabase clients; hooks; app.d.ts; email/password; verification callback; reset/update password; Google OAuth; profile table/RLS/trigger; auth layouts/pages; generic errors; empty `/app` shell.
+- **Prerequisites:** Sprint 1; Supabase redirect URLs; test email path; current official SSR docs reviewed; **Checkpoint 1 approved 2026-07-21** (see open-decisions / OD-19).
+- **Approved architecture (Checkpoint 1):** `getAuthContext()` via `getClaims()`; profile `user_id` + Auth insert trigger + idempotent ensure; own-user RLS only; defaults `en-CA` / `America/Edmonton`; `/app` shell; email must be verified before `(app)` (OD-19). OD-10 roles remain provisional until Sprint 3.
 - **Stories:** Authentication US-001–004 and own-profile behaviour.
 - **Technical tasks:** Small migrations; generated types; auth schemas; server actions; protected layout; account menu; session expiry handling.
-- **Security tasks:** No token logs; generic recovery; safe local redirects; own-profile RLS; cache review; rate/provider settings; service role absent.
-- **Tests:** Schema/unit; database own/other profile RLS; Playwright register/sign-in/sign-out/reset strategy; expired session/direct protected route.
-- **Documentation:** Auth implementation notes, environment variables, current SDK/version decisions.
-- **Demo:** Create/verify user, protected redirect, sign out, failed recovery response, inspect sanitized error.
-- **Acceptance criteria:** All auth acceptance criteria pass; no protected page data after sign-out; profile created exactly once.
+- **Security tasks:** No token logs; generic recovery; safe local redirects; own-profile RLS; verification gate; cache review; rate/provider settings; service role absent.
+- **Tests:** Schema/unit; database own/other profile RLS; Playwright register/sign-in/sign-out/reset strategy; expired session/direct protected route; unverified blocked from `/app`.
+- **Documentation:** Auth implementation notes, environment variables, current SDK/version decisions; Checkpoint 1 recorded in open-decisions.
+- **Demo:** Create/verify user, protected redirect to `/app`, sign out, failed recovery response, inspect sanitized error.
+- **Acceptance criteria:** All auth acceptance criteria pass; no protected page data after sign-out; profile created exactly once; unverified cannot access `/app`.
 - **Out of scope:** Household membership and invitations.
 - **Exit criteria:** Verified auth context is a stable request-scoped contract used by later services.
 
 ### Suggested checkpoints
 
-1. Schema/architecture and learning checkpoint.
+1. Schema/architecture and learning checkpoint — **complete (approved 2026-07-21).**
 2. Small happy-path vertical slice.
 3. Failure, permission and accessibility states.
 4. Automated tests and founder code review.
